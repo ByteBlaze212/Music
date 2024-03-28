@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:user_melo/mainpage.dart';
 import 'package:user_melo/navigationbar.dart';
+import 'package:user_melo/signup.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
         useMaterial3: true,
       ),
-      home: BottomNavigationHome(selectedIndex: 0,),
+      home:Signup(),
     );
   }
 }
