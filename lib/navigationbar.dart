@@ -30,7 +30,7 @@ class _BottomNavigationHomeState extends State<BottomNavigationHome> {
   List<Widget>widgetspage = [
     HomePage1(),
     const PlayList(),
-    const Search(),
+    const SearchScreen(),
     const AccountScreen(),
   ];
 
@@ -69,7 +69,7 @@ class _BottomNavigationHomeState extends State<BottomNavigationHome> {
               ),
             ),
             BottomNavigationBarItem(
-              backgroundColor: lr,
+              backgroundColor: Colors.black,
               label: "PlayList",
               icon: Icon(
                 Icons.playlist_add_check,

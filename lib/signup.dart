@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
+import 'package:image_picker/image_picker.dart';
 import 'color.dart';
 
 class Signup extends StatefulWidget {
@@ -20,9 +23,9 @@ class _SignupState extends State<Signup> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController cpass = TextEditingController();
-  TextEditingController _mobileController = TextEditingController();
   bool isLoading = false;
   String uniquefilename = DateTime.now().millisecondsSinceEpoch.toString();
+  XFile? _selectedImage;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,7 @@ class _SignupState extends State<Signup> {
         ),
       ),
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomLeft,
@@ -49,14 +52,13 @@ class _SignupState extends State<Signup> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            title: Text(
+            title: const Text(
               'Create Account',
               style: TextStyle(
                 fontStyle: FontStyle.italic,
                 color: Colors.orange,
                 fontSize: 28,
               ),
-
             ),
             centerTitle: true,
           ),
@@ -68,7 +70,42 @@ class _SignupState extends State<Signup> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Center(
+                          child: CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.grey[300],
+                            backgroundImage: _selectedImage != null
+                                ? FileImage(File(_selectedImage!.path))
+                                : null,
+                            child: _selectedImage == null
+                                ? IconButton(
+                              onPressed: () async {
+                                final ImagePicker _picker = ImagePicker();
+                                _selectedImage = await _picker.pickImage(
+                                    source: ImageSource.gallery);
+                                setState(() {});
+                              },
+                              icon: const Icon(Icons.add_a_photo),
+                            )
+                                : null,
+                          ),
+                        ),
+                        _selectedImage != null
+                            ? IconButton(
+                          onPressed: () {
+                            _selectedImage = null;
+                            setState(() {});
+                          },
+                          icon: const Icon(Icons.cancel),
+                        )
+                            : const SizedBox(),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
                     Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -86,7 +123,7 @@ class _SignupState extends State<Signup> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               labelText: 'Name',
-                              labelStyle: TextStyle(
+                              labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontStyle: FontStyle.italic,
@@ -94,7 +131,7 @@ class _SignupState extends State<Signup> {
                               hintText: 'Enter your Name',
                             ),
                           ),
-                          SizedBox(height: 30),
+                          const SizedBox(height: 30),
                           TextFormField(
                             controller: _emailController,
                             validator: (value) {
@@ -111,7 +148,7 @@ class _SignupState extends State<Signup> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               labelText: 'Email',
-                              labelStyle: TextStyle(
+                              labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontStyle: FontStyle.italic,
@@ -119,7 +156,7 @@ class _SignupState extends State<Signup> {
                               hintText: 'Enter Email',
                             ),
                           ),
-                          SizedBox(height: 30),
+                          const SizedBox(height: 30),
                           TextFormField(
                             controller: _passwordController,
                             validator: (value) {
@@ -134,13 +171,14 @@ class _SignupState extends State<Signup> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               labelText: 'Password',
-                              labelStyle: TextStyle(
+                              labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontStyle: FontStyle.italic,
                               ),
                               hintText: 'Set Password',
-                              prefixIcon: const Icon(Icons.lock_outline_rounded),
+                              prefixIcon:
+                              const Icon(Icons.lock_outline_rounded),
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -155,7 +193,7 @@ class _SignupState extends State<Signup> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 30),
+                          const SizedBox(height: 30),
                           TextFormField(
                             controller: cpass,
                             validator: (value) {
@@ -170,13 +208,14 @@ class _SignupState extends State<Signup> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               labelText: 'Confirm Password',
-                              labelStyle: TextStyle(
+                              labelStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                                 fontStyle: FontStyle.italic,
                               ),
                               hintText: 'Re-enter Password',
-                              prefixIcon: const Icon(Icons.lock_outline_rounded),
+                              prefixIcon:
+                              const Icon(Icons.lock_outline_rounded),
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -197,23 +236,25 @@ class _SignupState extends State<Signup> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 60),
+                          const SizedBox(height: 60),
                           Container(
                             height: 50,
                             width: 310,
                             decoration: BoxDecoration(
-                              border: Border.all(width: 5, color: Colors.transparent),
+                              border: Border.all(
+                                  width: 5, color: Colors.transparent),
                               color: lb,
                             ),
                             child: ElevatedButton(
-                              onPressed: () async {
-                                _submitForm();
-                              },
+                              onPressed: _submitForm,
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                                shadowColor: MaterialStateProperty.all<Color>(Colors.transparent),
+                                backgroundColor:
+                                MaterialStateProperty.all<Color>(
+                                    Colors.transparent),
+                                shadowColor: MaterialStateProperty.all<Color>(
+                                    Colors.transparent),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Sign Up',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -235,37 +276,57 @@ class _SignupState extends State<Signup> {
       ),
     );
   }
-
   void _submitForm() async {
     if (Form_key.currentState!.validate()) {
       setState(() {
         isLoading = true;
       });
       try {
-        if (_emailController != null) {
-          var userCredential;
-          await FirebaseFirestore.instance.collection("User").doc(userCredential.user!.uid).set({
+        if (_selectedImage != null) {
+          final File imageFile = File(_selectedImage!.path);
+
+          Reference referenceRoot = FirebaseStorage.instance.ref();
+          Reference referenceDirImage = referenceRoot.child('User_images');
+          Reference referenceImageToUpload =
+          referenceDirImage.child(uniquefilename);
+          await referenceImageToUpload.putFile(imageFile);
+          String imageUrl = await referenceImageToUpload.getDownloadURL();
+
+          UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: _emailController.text,
+            password: _passwordController.text,
+          );
+
+          await FirebaseFirestore.instance
+              .collection("User")
+              .doc(userCredential.user!.uid)
+              .set({
             "Name": _usernameController.text,
             "Email": _emailController.text,
             "Password": _passwordController.text,
-            "Mobile": _mobileController.text,
             "UID": FirebaseAuth.instance.currentUser!.uid,
             "DocumentID": userCredential.user!.uid,
+            "ProfileImage": imageUrl,
           });
 
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Registered Successfully")));
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Registered Successfully")));
 
           // Clear text fields and reset selected image
           _usernameController.clear();
           _emailController.clear();
           _passwordController.clear();
-          _mobileController.clear();
+          cpass.clear();
+          _selectedImage = null;
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please select an image")));
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Please select an image")));
         }
       } catch (e) {
         print("Error registering user: $e");
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to register user")));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to register user")));
       } finally {
         setState(() {
           isLoading = false;
@@ -273,4 +334,5 @@ class _SignupState extends State<Signup> {
       }
     }
   }
+
 }
