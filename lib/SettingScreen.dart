@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:user_melo/HelpCenter.dart';
+import 'package:user_melo/PlatformRules.dart';
+import 'package:user_melo/PrivacyPolicy.dart';
 import 'AboutScreen.dart';
 import 'Terms&Use.dart';
 
@@ -60,23 +63,23 @@ class SettingScreen extends StatelessWidget {
                   }),
               buildSettingsItem(context, "Privacy Policy", Icons.privacy_tip,
                       () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => const PrivacyPolicyPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const PrivacyPolicyScreen()));
                   }),
               buildSettingsItem(
-                  context, "Return Policy", Icons.keyboard_return, () {
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => const ReturnPolicyScreen()));
+                  context, "Platform Rules", Icons.rule, () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PlatformRulesScreen()));
               }),
               buildSettingsItem(context, "Help Center", Icons.help, () {
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => const NeedHelpScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const FaqScreen()));
               }),
             ],
           ),

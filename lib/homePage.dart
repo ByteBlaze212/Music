@@ -123,10 +123,10 @@ class CategoryList extends StatelessWidget {
       stream: FirebaseFirestore.instance.collection('Category').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ));
+          // return const Center(
+          //     child: CircularProgressIndicator(
+          //       color: Colors.white,
+          //     ));
         }
         if (!snapshot.hasData || snapshot.data == null) {
           return const Center(child: Text('No data available'));

@@ -192,6 +192,8 @@ class MusicPlayersScreen extends StatefulWidget {
   final Function(int) onIndexChanged;
   final VoidCallback onFavoritePressed;
 
+
+
   const MusicPlayersScreen({
     Key? key,
     required this.musicList,
@@ -208,9 +210,12 @@ class MusicPlayersScreen extends StatefulWidget {
 }
 
 class _MusicPlayersScreenState extends State<MusicPlayersScreen> {
+  String get currentSongImage => widget.musicList[widget.currentIndex].image;
+  String get currentSongName => widget.musicList[widget.currentIndex].songName;
   late Duration totalDuration;
   late Duration currentPosition;
   late bool isPlaying;
+  bool loopEnabled = false;
 
   @override
   void initState() {
@@ -325,7 +330,7 @@ class _MusicPlayersScreenState extends State<MusicPlayersScreen> {
                 ),
                 const SizedBox(height: 10),
                 Slider(
-                  value: currentPosition.inSeconds.toDouble(),
+                  value: currentPosition.inSeconds.toDouble().clamp(0.0, totalDuration.inSeconds.toDouble()),
                   onChanged: (value) {
                     setState(() {
                       currentPosition = Duration(seconds: value.toInt());
@@ -337,10 +342,21 @@ class _MusicPlayersScreenState extends State<MusicPlayersScreen> {
                   activeColor: lr,
                   inactiveColor: Colors.white70,
                 ),
-                const SizedBox(height: 20),
+
+
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    IconButton(
+                      icon: Icon(
+                          Icons.loop, color: loopEnabled ? lr : Colors.white),
+                      onPressed: () {
+                        setState(() {
+                          loopEnabled = !loopEnabled;
+                        });
+                      },
+                    ),
+
                     IconButton(
                       icon: const Icon(Icons.skip_previous, color: lr),
                       iconSize: 40,
@@ -351,6 +367,7 @@ class _MusicPlayersScreenState extends State<MusicPlayersScreen> {
                         }
                       },
                     ),
+                    SizedBox(width: 35,),
                     IconButton(
                       icon: Icon(
                         isPlaying ? Icons.pause : Icons.play_arrow,
@@ -368,6 +385,7 @@ class _MusicPlayersScreenState extends State<MusicPlayersScreen> {
                         });
                       },
                     ),
+                    SizedBox(width: 35,),
                     IconButton(
                       icon: const Icon(Icons.skip_next, color: lr),
                       iconSize: 40,
@@ -415,7 +433,8 @@ class _MusicPlayersScreenState extends State<MusicPlayersScreen> {
                                             builder: (context) =>
                                                 ZoomableLyricsPage(
                                                   musicList: widget.musicList,
-                                                  currentIndex: widget.currentIndex,
+                                                  currentIndex: widget
+                                                      .currentIndex,
                                                 ),
                                           ));
                                     },
@@ -446,6 +465,8 @@ class _MusicPlayersScreenState extends State<MusicPlayersScreen> {
         ),
       ),
     );
+
+
   }
 
   String formatDuration(Duration duration) {
@@ -455,13 +476,34 @@ class _MusicPlayersScreenState extends State<MusicPlayersScreen> {
     return '$twoDigitMinutes:$twoDigitSeconds';
   }
 
+  // void _playSelectedSong(int index) {
+  //   widget.audioPlayer.stop();
+  //   widget.audioPlayer.seek(Duration.zero);
+  //   widget.audioPlayer.setUrl(widget.musicList[index].songURL);
+  //   widget.audioPlayer.play();
+  // }
   void _playSelectedSong(int index) {
     widget.audioPlayer.stop();
     widget.audioPlayer.seek(Duration.zero);
     widget.audioPlayer.setUrl(widget.musicList[index].songURL);
     widget.audioPlayer.play();
+
+    widget.audioPlayer.positionStream.listen((event) {
+      setState(() {
+        currentPosition = event;
+        if (loopEnabled && currentPosition >= totalDuration) {
+          // If loop is enabled and the current position exceeds the total duration, clamp it to the total duration
+          widget.audioPlayer.seek(Duration.zero);
+        }
+      });
+    });
   }
+
 }
+
+
+
+
 
 class ZoomableLyricsPage extends StatelessWidget {
   final List<MusicModel> musicList;

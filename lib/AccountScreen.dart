@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:user_melo/color.dart';
+import 'package:user_melo/playlist.dart';
 
 import 'SettingScreen.dart';
 import 'UserInfoScreen.dart';
@@ -18,12 +20,13 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.transparent,
         body: Container(
           width: double.infinity,
           height: double.infinity,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.white, Colors.red],
+              colors: [PBlue, Colors.black],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -78,7 +81,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     title: 'My WishList',
                     icon: Icons.favorite,
                     onTap: () {
-                      // Navigator.push(context, MaterialPageRoute(builder: (context) => const FavPage()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => LikedSongsWidget()));
                     },
                   ),
                   buildAccountCard(
@@ -115,6 +118,7 @@ class _AccountScreenState extends State<AccountScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Card(
+        color: Colors.white54,
         elevation: 3,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
@@ -132,6 +136,7 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
         ),
       ),
+
     );
   }
 }
